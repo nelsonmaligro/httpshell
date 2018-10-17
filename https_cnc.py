@@ -11,7 +11,7 @@ listenip = "0.0.0.0"
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.setblocking(0)
-server.bind((listenip, 6969))
+server.bind((listenip, 443))
 server.listen(5)
 
 #initialize encryption

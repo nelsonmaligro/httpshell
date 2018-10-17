@@ -49,7 +49,8 @@ try:
 			elif IO is sys.stdin:
 				cmd = sys.stdin.readline()
 				#lists all connected client
-				if cmd == 'sulod -l\n':
+				if cmd
+ == 'sulod -l\n':
 					for listsock in listclient:
 						sys.stdout.write("\n" + str(listsock.id))
 				#exit
@@ -82,7 +83,6 @@ try:
 				#if client is sending data
 				if (data):
 					data = ncrypt.decrypt(data)
-					data = data.rstrip()
 					sys.stdout.write("\n" + data)
  					sys.stdout.write("\n" + str(disSock.getpeername()) + "shell#")
 				#if client is disconnected

